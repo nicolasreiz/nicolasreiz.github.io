@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<!--
+  💡 INSIGHT #1 — As três camadas da web
+  HTML = ESTRUTURA (o esqueleto) · CSS = APARÊNCIA (a pele) · JS = COMPORTAMENTO (o cérebro).
+  Este arquivo só diz O QUE existe na página. Como fica e como reage está nos outros dois.
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <!-- 💡 Faz o site se adaptar ao celular. Sem isso, o celular mostra a versão de PC minúscula. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 💡 SEO: aparecem no Google e no "card" quando você manda o link no WhatsApp/LinkedIn -->
+  <title>Nicolas Neves — Ciência da Computação e Machine Learning</title>
+  <meta name="description" content="Nicolas dos Reis Neves, estudante de Ciência da Computação com foco em Machine Learning e Inteligência Artificial." />
+  <meta name="author" content="Nicolas dos Reis Neves" />
+  <meta property="og:title" content="Nicolas Neves" />
+  <meta property="og:description" content="Ciência da Computação, Machine Learning e Inteligência Artificial." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/img/nicolas.jpg" />
+  <meta name="theme-color" content="#050a07" />
+
+  <!-- Favicon: um "N" de fósforo verde, desenhado em SVG direto no código -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23050a07'/><text x='50' y='76' font-size='84' text-anchor='middle' fill='%235dff8f' font-family='monospace'>N</text></svg>" />
+
+  <!--
+    💡 INSIGHT #2 — Tipografia é personalidade
+    Duas fontes, cada uma com um papel bem claro:
+      • VT323 → fonte "bitmap" de terminal antigo, para títulos (é ela que dá o clima de monitor de fósforo)
+      • IBM Plex Mono → monoespaçada limpa, para ler textos longos sem cansar
+    "preconnect" abre a conexão com o Google Fonts antes, pra carregar mais rápido.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=VT323&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- 💡 Link "pular para o conteúdo": invisível até alguém navegar pelo teclado (Tab). Acessibilidade! -->
+  <a href="#conteudo" class="skip">Pular para o conteúdo</a>
+
+  <!-- Fundo: grade de pontos que acende onde o mouse passa (desenhada pelo JS) -->
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <!--
+    💡 INSIGHT #3 — HTML semântico
+    <header>, <nav>, <main>, <section>, <footer> dizem ao navegador (e ao Google, e a
+    leitores de tela) o PAPEL de cada parte. <div> não diz nada.
+  -->
+  <header class="bar" id="bar">
+    <a href="#inicio" class="brand">nicolas.neves</a>
+    <button class="menu-btn" id="menu-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav">menu</button>
+    <nav id="nav" class="nav">
+      <a href="#sobre">sobre</a>
+      <a href="#projetos">projetos</a>
+      <a href="#terminal">terminal</a>
+      <a href="#contato">contato</a>
+    </nav>
+  </header>
+
+  <main id="conteudo">
+    <!-- ============ INÍCIO ============ -->
+    <section id="inicio" class="hero">
+      <div class="hero-main">
+        <p class="cmd-line"><span class="ps1">nicolas@lab:~$</span> whoami</p>
+
+        <!--
+          O nome é desenhado num painel de LED pelo JS (veja main.js).
+          O <h1> continua aqui, escondido visualmente, para o Google e leitores de tela
+          saberem o título da página. 💡 Nunca troque texto importante só por imagem/canvas!
+        -->
+        <div class="led-panel" id="led-panel">
+          <h1 class="sr-only">Nicolas Neves</h1>
+          <canvas id="led-name" aria-hidden="true"></canvas>
+        </div>
+
+        <p class="hero-sub">
+          Estudante de Ciência da Computação, 22 anos.
+          Meu foco é Machine Learning e Inteligência Artificial<span class="cursor" aria-hidden="true"></span>
+        </p>
+
+        <!--
+          💡 INSIGHT #19 — Atalhos de teclado
+          Em vez dos dois botões que todo site tem, a navegação funciona como num programa
+          de terminal: apertar P, C ou T no teclado leva à seção. Os links continuam
+          clicáveis para quem usa mouse ou celular. (A lógica está em iniciarAtalhos, no main.js.)
+        -->
+        <nav class="keys" aria-label="Atalhos">
+          <a href="#projetos"><kbd>P</kbd> projetos</a>
+          <a href="#contato"><kbd>C</kbd> contato</a>
+          <a href="#terminal"><kbd>T</kbd> terminal</a>
+        </nav>
+      </div>
+
+      <!-- Robô assistente em SVG: os olhos seguem o mouse, ele pisca e fala quando clicado -->
+      <aside class="robot-wrap" aria-label="NicoBot, o robô assistente">
+        <button class="robot" id="robot" aria-label="Clique para o NicoBot falar">
+          <svg viewBox="0 0 200 220" aria-hidden="true">
+            <line x1="100" y1="38" x2="100" y2="16" class="r-line" />
+            <circle cx="100" cy="11" r="6" class="r-led" />
+            <rect x="16" y="88" width="14" height="44" class="r-part" />
+            <rect x="170" y="88" width="14" height="44" class="r-part" />
+            <rect x="30" y="38" width="140" height="130" rx="18" class="r-head" />
+            <rect x="46" y="60" width="108" height="64" rx="6" class="r-visor" />
+            <g id="robot-eyes">
+              <rect x="68" y="78" width="18" height="28" class="r-eye" />
+              <rect x="114" y="78" width="18" height="28" class="r-eye" />
+            </g>
+            <g class="r-mouth">
+              <rect x="74" y="140" width="6" height="8" />
+              <rect x="85" y="140" width="6" height="8" />
+              <rect x="96" y="140" width="6" height="8" />
+              <rect x="107" y="140" width="6" height="8" />
+              <rect x="118" y="140" width="6" height="8" />
+            </g>
+            <rect x="84" y="168" width="32" height="14" class="r-part" />
+            <rect x="50" y="182" width="100" height="38" rx="8" class="r-head" />
+            <circle cx="100" cy="201" r="6" class="r-led" />
+          </svg>
+        </button>
+        <!-- aria-live="polite": leitores de tela anunciam o que o robô fala -->
+        <p class="robot-says" aria-live="polite"><span class="ps1">nicobot&gt;</span> <span id="robot-text"></span></p>
+      </aside>
+    </section>
+
+    <!-- ============ SOBRE ============ -->
+    <section id="sobre" class="block">
+      <h2 class="cmd"><span class="ps1" aria-hidden="true">$</span> cat sobre</h2>
+
+      <div class="about">
+        <div class="prose">
+          <p>
+            Sou o Nicolas dos Reis Neves. Entrei em Ciência da Computação porque queria entender
+            como os programas funcionam por dentro, e encontrei a área que mais me prende:
+            sistemas que aprendem a partir de dados.
+          </p>
+          <p>
+            Divido meu tempo entre a base teórica (Python, álgebra linear e estatística) e
+            projetos que vão para o mundo real, como o NicoBot, um bot para WhatsApp com
+            usuários de verdade.
+          </p>
+          <p>
+            Agora estou treinando meus primeiros modelos de Machine Learning. Tudo o que eu
+            publicar vai aparecer aqui.
+          </p>
+        </div>
+
+        <!-- 💡 <figure> + <figcaption> = imagem com legenda, de forma semântica -->
+        <figure class="photo">
+          <!-- 💡 loading="lazy" só baixa a imagem quando ela estiver perto de aparecer -->
+          <img src="assets/img/nicolas.jpg" alt="Nicolas dos Reis Neves" loading="lazy" width="854" height="1280" />
+        </figure>
+      </div>
+
+      <!--
+        💡 INSIGHT #4 — <dl>: lista de definições
+        Feita para pares "termo → descrição". Perfeito para "estudando agora → Python, ML...".
+        Usar a tag certa para cada tipo de conteúdo é o coração do HTML semântico.
+      -->
+      <h3 class="sub">Ferramentas</h3>
+      <dl class="tools" id="tools"></dl>
+    </section>
+
+    <!-- ============ TRAJETÓRIA ============ -->
+    <section id="trajetoria" class="block">
+      <h2 class="cmd"><span class="ps1" aria-hidden="true">$</span> git log</h2>
+      <!-- 💡 <ol> = lista ORDENADA. Aqui a ordem importa de verdade: é uma linha do tempo. -->
+      <ol class="gitlog" id="gitlog"></ol>
+    </section>
+
+    <!-- ============ PROJETOS ============ -->
+    <section id="projetos" class="block">
+      <h2 class="cmd"><span class="ps1" aria-hidden="true">$</span> ls projetos</h2>
+      <!-- Gerado pelo JS a partir da lista PROJETOS em main.js -->
+      <ul class="projects" id="projects"></ul>
+    </section>
+
+    <!-- ============ TERMINAL ============ -->
+    <section id="terminal" class="block">
+      <h2 class="cmd"><span class="ps1" aria-hidden="true">$</span> ./terminal</h2>
+      <p class="lead">Digite <kbd>help</kbd> e aperte Enter.</p>
+
+      <div class="term" id="term-body">
+        <div id="term-output"></div>
+        <!-- 💡 Usar <form> faz o Enter enviar o comando sem nenhum código extra -->
+        <form class="term-line" id="term-form" autocomplete="off">
+          <label for="term-input" class="ps1">visitante@lab:~$</label>
+          <input type="text" id="term-input" spellcheck="false" autocapitalize="off" />
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ CONTATO ============ -->
+    <section id="contato" class="block">
+      <h2 class="cmd"><span class="ps1" aria-hidden="true">$</span> mail nicolas</h2>
+      <p class="lead">A mensagem abre pronta no meu WhatsApp.</p>
+
+      <div class="contact">
+        <!--
+          💡 INSIGHT #5 — Formulário sem servidor
+          Normalmente um formulário envia dados para um back-end. Aqui não existe back-end:
+          o JS monta um link https://wa.me/NUMERO?text=MENSAGEM e abre o WhatsApp. Grátis e simples.
+          novalidate desliga os balões de erro do navegador para mostrarmos os nossos.
+        -->
+        <form class="form" id="contact-form" novalidate>
+          <div class="field">
+            <label for="nome">nome</label>
+            <input type="text" id="nome" name="nome" required minlength="2" autocomplete="name" />
+            <p class="error">Escreva seu nome (pelo menos 2 letras).</p>
+          </div>
+
+          <div class="field">
+            <label for="assunto">assunto</label>
+            <select id="assunto" name="assunto" required>
+              <option value="">escolha um</option>
+              <option>Oportunidade de estágio ou trabalho</option>
+              <option>Proposta de projeto</option>
+              <option>Dúvida sobre o NicoBot</option>
+              <option>Conversar sobre IA</option>
+            </select>
+            <p class="error">Escolha um assunto.</p>
+          </div>
+
+          <div class="field">
+            <label for="mensagem">mensagem <span class="count" id="count">0/500</span></label>
+            <textarea id="mensagem" name="mensagem" rows="5" required minlength="5" maxlength="500"></textarea>
+            <p class="error">Escreva a mensagem (pelo menos 5 caracteres).</p>
+          </div>
+
+          <button type="submit" class="btn">Abrir no WhatsApp</button>
+        </form>
+
+        <dl class="addresses">
+          <div>
+            <dt><span data-icon="mail"></span>e-mail</dt>
+            <dd>
+              <a href="mailto:nickreisnreis16@gmail.com">nickreisnreis16@gmail.com</a>
+              <button type="button" class="copy" data-copy="nickreisnreis16@gmail.com">copiar</button>
+            </dd>
+          </div>
+          <div>
+            <dt><span data-icon="message"></span>whatsapp</dt>
+            <dd><a href="https://wa.me/5511982569125" target="_blank" rel="noopener">(11) 98256-9125</a></dd>
+          </div>
+          <div>
+            <dt><span data-icon="linkedin"></span>linkedin</dt>
+            <!-- 💡 rel="noopener": a aba nova não consegue controlar a sua (segurança) -->
+            <dd><a href="#" class="js-linkedin" target="_blank" rel="noopener">nicolas-dos-reis-neves</a></dd>
+          </div>
+          <div>
+            <dt><span data-icon="github"></span>github</dt>
+            <dd><a href="https://github.com/nicolasreiz" target="_blank" rel="noopener">@nicolasreiz</a></dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Nicolas Neves, 2026</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- 💡 Script no fim do <body>: quando ele roda, todo o HTML acima já existe -->
+  <script src="js/main.js"></script>
+</body>
+</html>

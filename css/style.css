@@ -1,0 +1,421 @@
+/* ==========================================================================
+   💡 INSIGHT #6 — Como fugir da "cara de site feito por IA"
+   Sites genéricos repetem as mesmas escolhas: degradê no título, cards
+   arredondados todos iguais, número "01." em tudo, barras de % de skill,
+   tudo surgindo com fade ao rolar. Aqui cada escolha vem do TEMA
+   (um monitor de fósforo verde, o mundo do Matrix):
+     • cor: o verde real dos monitores antigos, sobre um preto esverdeado
+     • forma: cantos retos, linhas finas, como uma tela de terminal
+     • estrutura: títulos são comandos (cat, ls, git log) porque o site É um terminal
+     • movimento: só UM momento automático (o nome "ligando"); o resto responde a você
+   Pergunta para se fazer sempre: "isso serve a ESTE projeto, ou eu colocaria em qualquer um?"
+   ========================================================================== */
+
+/* 💡 INSIGHT #7 — Variáveis CSS: troque uma cor aqui e o site inteiro muda */
+:root {
+  --void: #050a07;          /* o "preto" da tela apagada, levemente verde */
+  --panel: #0a140e;         /* superfícies um tom acima */
+  --phosphor: #5dff8f;      /* o verde do fósforo aceso */
+  --phosphor-dim: #2c7a4a;  /* fósforo fraco: bordas, pontos apagados */
+  --ink: #c6dccd;           /* texto de leitura: verde quase cinza, cansa menos a vista */
+  --muted: #7d9887;         /* texto secundário */
+  --amber: #ffb547;         /* segunda cor, usada com moderação: foco, alertas, LEDs */
+  --line: rgba(93, 255, 143, 0.16);
+
+  --display: "VT323", monospace;
+  --text: "IBM Plex Mono", ui-monospace, monospace;
+
+  --measure: 64ch;          /* 💡 largura ideal de leitura: ~60–75 caracteres por linha */
+  --gutter: clamp(16px, 5vw, 64px);
+  --glow: 0 0 6px rgba(93, 255, 143, 0.45), 0 0 18px rgba(93, 255, 143, 0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+
+body {
+  background: var(--void);
+  color: var(--ink);
+  font: 400 1rem/1.75 var(--text);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Linhas de varredura de CRT por cima de tudo.
+   💡 repeating-linear-gradient repete um padrão: 2px transparente, 1px escuro... */
+body::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;           /* não atrapalha cliques */
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.16) 2px 3px);
+  z-index: 50;
+}
+
+a { color: var(--phosphor); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 4px; }
+::selection { background: var(--phosphor); color: var(--void); }
+
+/* 💡 Foco visível: quem navega pelo teclado precisa ver onde está */
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+/* 💡 Esconde visualmente mas mantém para leitores de tela (padrão da web) */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.skip { position: absolute; left: 16px; top: -100px; background: var(--amber); color: var(--void); padding: 8px 12px; z-index: 200; }
+.skip:focus { top: 16px; }
+
+#bg { position: fixed; inset: 0; z-index: -1; }
+
+.ps1 { color: var(--phosphor); }
+kbd { font-family: var(--text); color: var(--phosphor); border: 1px solid var(--phosphor-dim); padding: 0 6px; }
+
+/* ---------- Barra superior ---------- */
+.bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+  padding: 0 var(--gutter);
+  background: rgba(5, 10, 7, 0.88);
+  border-bottom: 1px solid var(--line);
+  z-index: 100;
+}
+.brand { font-family: var(--display); font-size: 1.6rem; color: var(--phosphor); text-shadow: var(--glow); }
+.brand:hover { text-decoration: none; }
+.nav { display: flex; gap: 28px; }
+.nav a { color: var(--muted); font-size: 0.9rem; }
+/* O link da seção atual fica "selecionado", como num terminal */
+.nav a:hover, .nav a.active { color: var(--void); background: var(--phosphor); text-decoration: none; }
+.nav a { padding: 2px 6px; }
+.menu-btn { display: none; }
+
+/* ---------- Botões ---------- */
+.btn {
+  display: inline-block;
+  font: 500 0.95rem var(--text);
+  padding: 12px 22px;
+  background: var(--phosphor);
+  color: var(--void);
+  border: 1px solid var(--phosphor);
+  cursor: pointer;
+}
+.btn:hover { text-decoration: none; box-shadow: var(--glow); }
+.btn:active { transform: translateY(1px); }
+.btn-quiet { background: transparent; color: var(--phosphor); }
+.btn-quiet:hover { background: rgba(93, 255, 143, 0.08); }
+
+/* ---------- Início ---------- */
+.hero {
+  min-height: 100svh;              /* 💡 svh = altura real da tela no celular (ignora a barra do navegador) */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(200px, 24vw, 300px);
+  align-items: center;
+  gap: clamp(24px, 5vw, 72px);
+  padding: 96px var(--gutter) 64px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.cmd-line { color: var(--muted); font-size: 0.95rem; margin-bottom: 18px; }
+
+/* O painel de LED onde o nome é desenhado */
+.led-panel {
+  background: var(--void);
+  border: 1px solid var(--line);
+  padding: 14px;
+}
+#led-name { display: block; width: 100%; max-width: 100%; }
+.hero-main { min-width: 0; }
+
+.hero-sub { max-width: 52ch; margin: 28px 0 32px; font-size: 1.06rem; }
+.cursor {
+  display: inline-block; width: 0.6em; height: 1.1em;
+  margin-left: 4px; vertical-align: text-bottom;
+  background: var(--phosphor);
+  animation: blink 1.1s steps(1) infinite;
+}
+/* Atalhos de teclado: a tecla parece uma tecla de verdade */
+.keys { display: flex; flex-wrap: wrap; gap: 10px 28px; }
+.keys a { color: var(--ink); display: inline-flex; align-items: center; gap: 10px; }
+.keys a:hover { color: var(--phosphor); text-decoration: none; }
+.keys kbd {
+  display: inline-grid; place-items: center;
+  min-width: 2.1em; height: 2.1em;
+  font: 400 1.35rem/1 var(--display);
+  color: var(--phosphor);
+  border: 1px solid var(--phosphor-dim);
+  border-bottom-width: 3px;          /* "espessura" de tecla física */
+  padding: 0;
+}
+.keys a:hover kbd { background: var(--phosphor); color: var(--void); border-color: var(--phosphor); }
+/* No celular não existe teclado físico: mostramos só o nome, sem a tecla */
+@media (hover: none) { .keys kbd { display: none; } .keys a { text-decoration: underline; text-underline-offset: 4px; } }
+
+/* ---------- Robô ---------- */
+.robot-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.robot { background: none; border: 0; padding: 0; cursor: pointer; width: 100%; }
+.robot svg { display: block; width: 100%; height: auto; overflow: visible; }
+/* 💡 Partes do SVG aceitam CSS como qualquer elemento HTML */
+.r-head  { fill: var(--panel); stroke: var(--phosphor); stroke-width: 2; }
+.r-part  { fill: var(--void); stroke: var(--phosphor-dim); stroke-width: 2; }
+.r-line  { stroke: var(--phosphor); stroke-width: 3; }
+.r-visor { fill: #020503; stroke: var(--phosphor-dim); stroke-width: 1.5; }
+.r-eye {
+  fill: var(--phosphor);
+  filter: drop-shadow(0 0 5px var(--phosphor));
+  transform-box: fill-box; transform-origin: center;
+  transition: transform 0.12s;
+}
+#robot-eyes { transition: transform 0.15s ease-out; }
+.robot.blink .r-eye { transform: scaleY(0.08); }
+.robot.happy .r-eye { transform: scaleY(0.4) translateY(5px); }
+.r-led { fill: var(--amber); }
+.r-mouth rect { fill: var(--phosphor); opacity: 0.45; transform-box: fill-box; transform-origin: center; }
+.robot.talking .r-mouth rect { opacity: 1; animation: talk 0.3s ease-in-out infinite alternate; }
+.robot.talking .r-mouth rect:nth-child(even) { animation-delay: 0.12s; }
+.robot:focus-visible { outline-offset: 8px; }
+
+.robot-says {
+  width: 100%;
+  min-height: 4.5em;               /* reserva espaço: o layout não "pula" enquanto ele digita */
+  font-size: 0.88rem;
+  color: var(--ink);
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+/* ---------- Blocos (seções) ---------- */
+.block {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 96px var(--gutter);
+  border-top: 1px solid var(--line);
+}
+/* Títulos de seção são comandos de terminal, na fonte bitmap */
+.cmd {
+  font: 400 clamp(2.2rem, 5vw, 3.2rem)/1 var(--display);
+  color: var(--phosphor);
+  text-shadow: var(--glow);
+  margin-bottom: 20px;
+}
+.cmd .ps1 { color: var(--phosphor-dim); text-shadow: none; }
+.lead { color: var(--muted); max-width: var(--measure); margin-bottom: 40px; }
+.sub { font: 400 1.9rem/1 var(--display); color: var(--phosphor); margin: 72px 0 24px; }
+
+/* ---------- Sobre ---------- */
+.about {
+  display: grid;
+  grid-template-columns: minmax(0, var(--measure)) minmax(220px, 320px);
+  gap: clamp(32px, 6vw, 80px);
+  align-items: start;
+}
+.prose p + p { margin-top: 1.1em; }
+
+/* Foto monocromática de fósforo que revela as cores no hover */
+.photo { position: relative; }
+.photo img {
+  display: block; width: 100%; height: auto;
+  aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 15%;
+  /* 💡 sepia + hue-rotate é um truque para "tingir" uma foto de uma cor só */
+  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(2.2) brightness(0.8) contrast(1.15);
+  border: 1px solid var(--line);
+  transition: filter 0.5s ease;
+}
+.photo::after {                     /* scanlines mais fortes só na foto */
+  content: ""; position: absolute; left: 0; right: 0; top: 0;
+  aspect-ratio: 4 / 5;
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.35) 2px 4px);
+  pointer-events: none; transition: opacity 0.5s;
+}
+.photo:hover img { filter: none; }
+.photo:hover::after { opacity: 0; }
+.photo figcaption { font-size: 0.78rem; color: var(--muted); margin-top: 10px; }
+
+/* Ferramentas: lista de definições em 3 colunas */
+.tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.tools dt { color: var(--phosphor); margin-bottom: 10px; }
+.tools dd { list-style: none; }
+.tools li { list-style: none; color: var(--ink); }
+.tools li::before { content: "- "; color: var(--phosphor-dim); }
+.tools .note { color: var(--muted); font-size: 0.85rem; margin-top: 10px; }
+
+/* ---------- git log ---------- */
+.gitlog { list-style: none; max-width: 760px; }
+.gitlog li {
+  display: grid;
+  grid-template-columns: 8ch 1fr;
+  gap: 4px 20px;
+  padding: 18px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.gitlog .hash { color: var(--amber); }
+.gitlog .msg { color: var(--ink); }
+.gitlog .msg b { color: var(--phosphor); font-weight: 500; }
+.gitlog .when { grid-column: 2; color: var(--muted); font-size: 0.85rem; }
+.gitlog .head { color: var(--void); background: var(--phosphor); padding: 0 6px; margin-left: 8px; font-size: 0.8rem; }
+
+/* ---------- Projetos (lista estilo ls) ---------- */
+.projects { list-style: none; border-top: 1px solid var(--line); }
+.projects > li { border-bottom: 1px solid var(--line); }
+.proj-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 14ch 2ch;   /* nome | tipo | status | + */
+  align-items: baseline;
+  gap: 24px;
+  padding: 22px 8px;
+  background: none; border: 0; color: inherit; font: inherit; text-align: left;
+  cursor: pointer;
+}
+.proj-name { font: 400 clamp(1.9rem, 4vw, 2.6rem)/1 var(--display); color: var(--phosphor); }
+.proj-kind { color: var(--muted); font-size: 0.9rem; }
+.proj-status { font-size: 0.8rem; color: var(--phosphor); }
+.proj-status.dev { color: var(--amber); }
+.proj-toggle { color: var(--phosphor-dim); font-size: 0.9rem; width: 2ch; text-align: right; }
+/* Linha "selecionada" ao passar o mouse: cores invertidas, como num menu de terminal */
+.proj-row:hover, .proj-row[aria-expanded="true"] { background: var(--phosphor); }
+.proj-row:hover *, .proj-row[aria-expanded="true"] * { color: var(--void); text-shadow: none; }
+
+/* 💡 INSIGHT #8 — Animar a altura de "auto"
+   CSS não sabe animar height: 0 → auto. O truque moderno: um grid com uma linha
+   que vai de 0fr (zero) a 1fr (o tamanho do conteúdo). */
+.proj-detail { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s ease; }
+.proj-detail > div { overflow: hidden; }
+.proj-detail.open { grid-template-rows: 1fr; }
+.proj-body { padding: 8px 8px 32px; max-width: var(--measure); }
+.proj-body p { margin-bottom: 14px; }
+.proj-body ul { list-style: none; margin-bottom: 16px; }
+.proj-body li::before { content: "> "; color: var(--phosphor-dim); }
+.stack { color: var(--muted); font-size: 0.88rem; margin-bottom: 14px; }
+.proj-links { display: flex; gap: 20px; }
+
+/* ---------- Terminal ---------- */
+.term {
+  background: rgba(2, 5, 3, 0.9);
+  border: 1px solid var(--phosphor-dim);
+  padding: 20px;
+  height: 380px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  cursor: text;
+}
+.term-line { display: flex; gap: 10px; align-items: center; }
+#term-input {
+  flex: 1; min-width: 0;
+  background: transparent; border: 0; outline: 0;
+  color: var(--ink); font: inherit; caret-color: var(--phosphor);
+}
+#term-output > div { white-space: pre-wrap; margin-bottom: 10px; color: var(--muted); }
+#term-output .cmd-echo { color: var(--ink); margin-bottom: 4px; }
+#term-output .cmd-echo::before { content: "visitante@lab:~$ "; color: var(--phosphor); }
+#term-output .err { color: var(--amber); }
+#term-output .ok { color: var(--phosphor); }
+
+/* ---------- Contato ---------- */
+.contact { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 80px); }
+.form { display: flex; flex-direction: column; gap: 22px; }
+.field label { display: flex; color: var(--phosphor); font-size: 0.9rem; margin-bottom: 6px; }
+.field label::before { content: "> "; color: var(--phosphor-dim); white-space: pre; }
+.count { margin-left: auto; color: var(--muted); }
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: rgba(2, 5, 3, 0.85);
+  border: 1px solid var(--phosphor-dim);
+  color: var(--ink);
+  font: inherit;
+  padding: 12px 14px;
+  border-radius: 0;
+  resize: vertical;
+}
+.field select { appearance: none; cursor: pointer; }
+.field select option { background: var(--void); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--phosphor); box-shadow: var(--glow); }
+.error { display: none; color: var(--amber); font-size: 0.85rem; margin-top: 6px; }
+.field.invalid input, .field.invalid select, .field.invalid textarea { border-color: var(--amber); }
+.field.invalid .error { display: block; }
+.form .btn { align-self: flex-start; }
+
+.addresses > div { padding: 16px 0; border-bottom: 1px dashed var(--line); }
+.addresses > div:first-child { padding-top: 0; }
+.addresses dt { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 0.85rem; }
+.addresses dd { margin-top: 4px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px; word-break: break-all; }
+.copy {
+  background: none; border: 1px solid var(--phosphor-dim); color: var(--muted);
+  font: 0.75rem var(--text); padding: 1px 8px; cursor: pointer;
+}
+.copy:hover { color: var(--phosphor); border-color: var(--phosphor); }
+
+/* Ícones SVG de linha: herdam a cor do texto (currentColor) */
+[data-icon] { display: inline-flex; line-height: 0; }
+[data-icon] svg { width: 1.05em; height: 1.05em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Rodapé & toast ---------- */
+.foot {
+  border-top: 1px solid var(--line);
+  padding: 40px var(--gutter);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  color: var(--muted); font-size: 0.85rem;
+  max-width: 1080px; margin: 0 auto;
+}
+
+.toast {
+  position: fixed; left: 50%; bottom: 24px;
+  transform: translate(-50%, calc(100% + 40px));
+  visibility: hidden;
+  background: var(--void); color: var(--phosphor);
+  border: 1px solid var(--phosphor);
+  padding: 12px 20px; font-size: 0.9rem;
+  transition: transform 0.3s ease;
+  z-index: 300; max-width: calc(100% - 32px);
+}
+.toast.show { transform: translate(-50%, 0); visibility: visible; }
+
+/* ---------- Modo chuva (código Konami): o verde fica mais intenso ---------- */
+body.rain { --phosphor: #7dffa6; --glow: 0 0 8px rgba(125, 255, 166, 0.7), 0 0 26px rgba(125, 255, 166, 0.3); }
+
+/* ---------- Animações ---------- */
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes talk  { from { transform: scaleY(1); } to { transform: scaleY(2.6); } }
+
+/* 💡 Respeita quem pediu ao sistema para reduzir animações */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ==========================================================================
+   💡 INSIGHT #9 — Media queries: "se a tela tiver até X px, faça assim"
+   ========================================================================== */
+@media (max-width: 860px) {
+  .menu-btn {
+    display: block;
+    background: none; border: 1px solid var(--phosphor-dim);
+    color: var(--phosphor); font: 0.85rem var(--text); padding: 4px 10px; cursor: pointer;
+  }
+  .nav {
+    position: fixed; top: 56px; left: 0; right: 0;
+    flex-direction: column; gap: 0;
+    background: var(--void); border-bottom: 1px solid var(--line);
+    display: none;
+  }
+  .nav.open { display: flex; }
+  .nav a { padding: 14px var(--gutter); font-size: 1rem; border-top: 1px solid var(--line); }
+
+  /* 💡 minmax(0, 1fr) e não só 1fr: "1fr" deixa a coluna crescer até o tamanho mínimo
+     do conteúdo (aqui, o canvas), estourando a tela. O 0 permite encolher. */
+  .hero { grid-template-columns: minmax(0, 1fr); align-content: center; padding-top: 80px; }
+  .robot-wrap { order: -1; flex-direction: row; align-items: center; }
+  .robot { width: 110px; flex-shrink: 0; }
+  .robot-says { border-top: 0; border-left: 1px solid var(--line); padding: 0 0 0 14px; min-height: 0; }
+
+  .about, .contact { grid-template-columns: 1fr; }
+  .photo { max-width: 320px; }
+  .tools { grid-template-columns: 1fr; gap: 24px; }
+  .proj-row { grid-template-columns: 1fr auto; gap: 6px 16px; }
+  .proj-kind { grid-column: 1; grid-row: 2; }
+  .proj-status { grid-row: 1; grid-column: 2; }
+  .proj-toggle { display: none; }
+  .block { padding: 72px var(--gutter); }
+  .term { height: 320px; font-size: 0.82rem; }
+}
